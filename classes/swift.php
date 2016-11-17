@@ -3,14 +3,13 @@ require_once ABSPATH.'vendor/autoload.php';
 require_once 'swift-plugin-base.php';
 
 class Swift extends Swift_Plugin_Base {
-	private $swiftClient, $storageUrl, $uploadHash;
+	private $swiftClient, $storageUrl;
 
 	const SETTINGS_KEY = 'object_storage';
 
 	function __construct( $plugin_file_path ) {
 		parent::__construct( $plugin_file_path );
 
-		$this->uploadHash = $this->swift_get_hash();
 		add_action( 'admin_menu', array( $this, 'swift_admin_menu' ) );
 
 		$this->plugin_title = __( 'IBM Object Storage', 'swift' );
@@ -23,9 +22,6 @@ class Swift extends Swift_Plugin_Base {
 		add_filter( 'delete_attachment', array( $this, 'swift_delete_attachment' ), 20 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'wp_calculate_image_srcset' ), 10, 5 );
 	}
-		private function swift_get_hash(){
-			return substr(md5(uniqid(mt_rand(), true)), 0, 4);
-		}
 
 		private function swift_get_vcap_variable( $variable ){
 			$vcap = getenv("VCAP_SERVICES");
@@ -176,7 +172,7 @@ class Swift extends Swift_Plugin_Base {
 
 				$args = array(
 			'Bucket'     => $bucket,
-			'Key'        => $prefix . $this->uploadHash . '/' . $file_name,
+			'Key'        => $prefix . '/' . $file_name,
 			'SourceFile' => $file_path,
 			'ACL'        => $acl
 				);
@@ -209,7 +205,7 @@ class Swift extends Swift_Plugin_Base {
 
 				add_post_meta( $post_id, 'swift_info', array(
 					'bucket' => $bucket,
-					'key' => $prefix . $this->uploadHash . '/' . $file_name
+					'key' => $prefix . '/' . $file_name
 				) );
 
 		$additional_images = array();
@@ -217,7 +213,7 @@ class Swift extends Swift_Plugin_Base {
 				if ( isset( $data['thumb'] ) && $data['thumb'] ) {
 			$path = str_replace( $file_name, $data['thumb'], $file_path );
 					$additional_images[] = array(
-				'Key'        => $prefix . $this->uploadHash . '/' . $data['thumb'],
+				'Key'        => $prefix . '/' . $data['thumb'],
 				'SourceFile' => $path
 					);
 					$files_to_remove[] = $path;
@@ -226,7 +222,7 @@ class Swift extends Swift_Plugin_Base {
 					foreach ( $data['sizes'] as $size ) {
 				$path = str_replace( $file_name, $size['file'], $file_path );
 						$additional_images[] = array(
-					'Key'        => $prefix . $this->uploadHash . '/' . $size['file'],
+					'Key'        => $prefix . '/' . $size['file'],
 					'SourceFile' => $path
 						);
 						$files_to_remove[] = $path;
