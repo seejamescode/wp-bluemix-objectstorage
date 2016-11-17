@@ -172,7 +172,7 @@ class Swift extends Swift_Plugin_Base {
 
 				$args = array(
 			'Bucket'     => $bucket,
-			'Key'        => $prefix . '/' . $file_name,
+			'Key'        => $prefix . $file_name,
 			'SourceFile' => $file_path,
 			'ACL'        => $acl
 				);
@@ -205,7 +205,7 @@ class Swift extends Swift_Plugin_Base {
 
 				add_post_meta( $post_id, 'swift_info', array(
 					'bucket' => $bucket,
-					'key' => $prefix . '/' . $file_name
+					'key' => $prefix . $file_name
 				) );
 
 		$additional_images = array();
@@ -213,7 +213,7 @@ class Swift extends Swift_Plugin_Base {
 				if ( isset( $data['thumb'] ) && $data['thumb'] ) {
 			$path = str_replace( $file_name, $data['thumb'], $file_path );
 					$additional_images[] = array(
-				'Key'        => $prefix . '/' . $data['thumb'],
+				'Key'        => $prefix . $data['thumb'],
 				'SourceFile' => $path
 					);
 					$files_to_remove[] = $path;
@@ -222,7 +222,7 @@ class Swift extends Swift_Plugin_Base {
 					foreach ( $data['sizes'] as $size ) {
 				$path = str_replace( $file_name, $size['file'], $file_path );
 						$additional_images[] = array(
-					'Key'        => $prefix . '/' . $size['file'],
+					'Key'        => $prefix . $size['file'],
 					'SourceFile' => $path
 						);
 						$files_to_remove[] = $path;
